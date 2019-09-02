@@ -1,0 +1,1 @@
+angular.module('DonationsApp', ['ui.route', 'ngCookies', 'ngTouch', 'ngAnimate', 'ui.bootstrap', 'ui.mask']);

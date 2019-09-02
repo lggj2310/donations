@@ -1,0 +1,164 @@
+<div class="row">
+    <div class="col-sm-12">
+        <br>
+        <script type="text/ng-template" id="group-template.html">
+            <div class="panel-heading">
+                <h4 class="panel-title" style="color:#fa39c3">
+                    <a href tabindex="0" class="accordion-toggle" ng-click="toggleOpen()" uib-accordion-transclude="heading">
+                        <span uib-accordion-header ng-class="{'text-muted': isDisabled}">
+                        {{heading}}
+                        </span>
+                    </a>
+                </h4>
+            </div>
+            <div class="panel-collapse collapse" uib-collapse="!isOpen">
+                <div class="panel-body" style="text-align: right" ng-transclude></div>
+            </div>
+        </script>
+        <uib-accordion close-others="true">
+            <div uib-accordion-group class="panel-info" heading="{{ dc.paymentInfo.PaymentTypeLabel}}"
+                is-open="true">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <span> {{ dc.paymentInfo.PaymentInstructions }} </span>
+                        <br>
+                        <span> {{ dc.paymentInfo.PaymentQuestion }} </span>
+                    </div>
+                </div>
+                <form name="dc.paymentForm">
+                    <div class="form-group" ng-class="{'has-error': !dc.paymentForm.amountOption.$valid && dc.paymentForm.amountOption.$touched}">
+                        <label ng-repeat="amount in dc.paymentInfo.AmountQuestions[0].AmountOptions" class="radio-inline">
+                            <span ng-if="amount.AmountLabel != ''">
+                                <input id="selected-amount" name="amountOption" ng-model="dc.donation.PaymentAmount" type="radio" ng-click="dc.customValue(false)" ng-value="{{amount.Amount}}" required> 
+                                {{ amount.AmountLabel }} 
+                            </span>
+                            <span ng-if="amount.AmountLabel == ''">
+                                <input id="selected-amount" ng-model="dc.customAmountField" name="amountOption" type="radio" ng-click="dc.customValue(true)" value="custom"> Custom Amount
+                                <input ng-if="dc.customAmount == true" type="number" name="amountOption" ng-model="dc.donation.PaymentAmount" ng-required="dc.customAmount == true" id="amount-value" placeholder="$"> 
+                            </span>
+                        </label>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': !dc.paymentForm.frecuencyOption.$valid && dc.paymentForm.frecuencyOption.$touched}">
+                        <span> {{ dc.paymentInfo.FrequencyInstructions }} </span>
+                        <br>
+                        <label ng-repeat="frecuency in dc.paymentInfo.FrequencyTypeList" class="radio-inline">
+                            <input type="radio" name="frecuencyOption" ng-model="dc.donation.FrequencyType" ng-value="{{frecuency}}" required> {{ dc.frecuencyOptionLabels[$index] }} 
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div uib-accordion-group class="panel-info" heading="{{ dc.paymentInfo.PaymentTypeLabel }} Information">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form id="cardInformationForm" name="dc.cardInformationForm" class="form-horizontal">
+                            <div class="form-group" ng-class="{'has-error': dc.cardInformationForm.cardType.$error.required && dc.cardInformationForm.cardType.$touched}">
+                                <label class="control-label col-sm-2" for="cardType">Card Type:</label>
+                                <div class="col-sm-10">
+                                    <select name="cardType" class="form-control" ng-change="dc.cardTypeValidation()" ng-model="dc.donation.CustomField1" id="cardType" required>
+                                        <option ng-repeat="cardType in dc.paymentInfo.CreditCardTypeList" ng-value="{{cardType}}"> {{ dc.creditCardTypes[$index] }} </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error': dc.cardInformationForm.cardNumber.$invalid && dc.cardInformationForm.cardNumber.$touched}">
+                                <label class="control-label col-sm-2" for="cardNumber">Card Number:</label>
+                                <div class="col-sm-10"> 
+                                    <input type="text" ng-disabled="dc.donation.CustomField1 == ''" ng-model="dc.donation.CustomField3" ui-options="'allowInvalidValue:false'" ng-pattern="dc.getCardPattern()" ng-change="dc.cardNumberValidation()" name="cardNumber" class="form-control" id="cardNumber" placeholder="Enter card number" required>
+                                    <span class="text-danger" ng-show="dc.cardInformationForm.cardNumber.$error.required && dc.cardInformationForm.cardNumber.$touched">
+                                        Required!
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error': !dc.cardInformationForm.cardVerificationNumber.$valid && dc.cardInformationForm.cardVerificationNumber.$touched}"> 
+                                <label class="control-label col-sm-2" for="cardVerificationNumber">Card Verification Number:</label>
+                                <div class="col-sm-10"> 
+                                    <input type="text" ng-pattern="/^[0-9]+$/" ng-maxlength="{{dc.verficiationNumberLength}}" name="cardVerificationNumber" class="form-control" ng-model="dc.donation.CustomField6"  id="cardVerificationNumber" placeholder="Enter card verification number" required>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error': dc.cardInformationForm.nameOnCard.$error.required && dc.cardInformationForm.nameOnCard.$touched}"> 
+                                <label class="control-label col-sm-2" for="nameOnCard">Name On Card:</label>
+                                <div class="col-sm-10"> 
+                                    <input type="text" name="nameOnCard" class="form-control" ng-model="dc.donation.CustomField2"  id="nameOnCard" placeholder="Enter the name on card" required>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error': dc.cardInformationForm.expirationDate.$error.required && dc.cardInformationForm.expirationDate.$touched}"> 
+                                <label class="control-label col-sm-2" for="expirationDate">Expiration Date:</label>
+                                <div class="col-sm-10"> 
+                                    <input type="text" ui-mask="99/9999" name="expirationDate" class="form-control" ng-model="dc.donation.CustomField4" id="expirationDate" placeholder="" required>
+                                </div>
+                            </div>
+                            <div class="form-group"> 
+                                <label class="col-sm-2" for="contactEmail">Contact Email Address:</label>
+                                <div class="col-sm-10"> 
+                                    <input type="email" name="contactEmail" class="form-control" ng-model="dc.donation.CustomField5" id="contactEmail" placeholder="Enter the contact email address">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div uib-accordion-group class="panel-info" heading="Billing Information">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form id="billingForm" name="dc.billingForm" class="form-horizontal">
+                            <div class="form-group" ng-class="{'has-error': billingForm.country.$error.required && billingForm.country.$touched}">
+                                <label class="control-label col-sm-2" for="country">Country</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" name="country" ng-model="dc.donation.Payment.BillingCountryCode" id="country" required>
+                                        <option ng-repeat="country in dc.countriesInfo" value="{{country.ISO}}"> {{ country.CountryName }} </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error': billingForm.address1.$error.required && billingForm.address1.$touched}">
+                                <label class="control-label col-sm-2" for="address1">Address 1</label>
+                                <div class="col-sm-10"> 
+                                    <input type="text" name="address1" class="form-control" ng-model="dc.donation.Payment.BillingAddress1" id="address1" placeholder="Address" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="address2">Address 2</label>
+                                <div class="col-sm-10"> 
+                                    <input type="text" name="address2" class="form-control" ng-model="dc.donation.Payment.BillingAddress2" id="address2" placeholder="Address">
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error': billingForm.city.$error.required && billingForm.city.$touched}">
+                                <label class="control-label col-sm-2" for="city">City</label>
+                                <div class="col-sm-10"> 
+                                    <input type="text" name="city" class="form-control" ng-model="dc.donation.Payment.BillingCity" id="city" placeholder="City" required>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="dc.donation.Payment.BillingCountryCode == 'us'" ng-class="{'has-error': billingForm.state.$error.required && billingForm.state.$touched}">
+                                <label class="control-label col-sm-2" for="state">State</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" name="state" ng-model="dc.donation.Payment.BillingState" id="state" ng-required="country == 'us'">
+                                        <option ng-repeat="state in dc.statesInfo" value="{{state.Code}}"> {{ state.Name }} - {{ state.Abbreviation }} </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="dc.donation.Payment.BillingCountryCode != 'us'" ng-class="{'has-error': billingForm.province.$error.required && billingForm.province.$touched}"> 
+                                <label class="control-label col-sm-2" for="province">Province</label>
+                                <div class="col-sm-10"> 
+                                    <input type="text" name="province" class="form-control" ng-model="dc.donation.Payment.BillingState" id="province" placeholder="Province" ng-required="country != 'us'">
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="dc.donation.Payment.BillingCountryCode == 'us'" ng-class="{'has-error': billingForm.zipCode.$error.required && billingForm.zipCode.$touched}"> 
+                                <label class="control-label col-sm-2" for="zipCode">Zip Code</label>
+                                <div class="col-sm-5"> 
+                                    <input type="text" name="zipCode" class="form-control" ng-model="dc.donation.Payment.BillingZipCode" id="zipCode" placeholder="Zip Code" ng-required="country == 'us'">
+                                </div>
+                                <div class="col-sm-5"> 
+                                    <input type="text" class="form-control" ng-model="dc.donation.Payment.BillingZipCodeExt" id="zipCodeExt" placeholder="Zip Code Extension">
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="dc.donation.Payment.BillingCountryCode != 'us'" ng-class="{'has-error': billingForm.postalCode.$error.required && billingForm.postalCode.$touched}"> 
+                                <label class="control-label col-sm-2" for="postalCode">Postal Code</label>
+                                <div class="col-sm-10"> 
+                                    <input type="text" name="postalCode" class="form-control" ng-model="dc.donation.Payment.BillingZipCode" id="postalCode" placeholder="Postal Code" ng-required="country != 'us'">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </uib-accordion>
+    </div>
+</div>
