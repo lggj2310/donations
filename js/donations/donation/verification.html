@@ -1,0 +1,16 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div ng-if="dc.isSuccess == true" class="panel panel-success">
+            <div class="jumbotron">
+                <div class="alert alert-success">
+                    <h2>Thank You! Donation was successfully sent.</h2>
+                </div>
+            </div>
+        </div>
+        <div ng-if="dc.isSuccess == false" class="panel panel-danger">
+            <div class="jumbotron">
+                {{dc.donationResponse.ValidationErrors}}
+            </div>
+        </div>
+    </div>
+</div>

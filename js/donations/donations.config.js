@@ -22,7 +22,7 @@ function config($stateProvider,$urlRouterProvider, growlProvider) {
 
         .state('donations', {
             url: "/donations",
-            templateUrl: "/js/donationsList/donations.page.html",
+            templateUrl: "/js/donations/donations.page.html",
             controller: "DonationsController",
             controllerAs: 'dsc'
         })
@@ -31,12 +31,7 @@ function config($stateProvider,$urlRouterProvider, growlProvider) {
             url: "/donation",
             templateUrl: "/js/donation/donation.page.html",
             controller: "DonationController",
-            controllerAs: 'dc',
-            resolve: {
-                donationConfig: ["DonorService", "$stateParams", function (DonorService, $stateParams) {
-                    return DonorService.GetPaymentTypeConfiguration($stateParams.donorToken, $stateParams.paymentType, $stateParams.callback);
-                }]            
-            }
+            controllerAs: 'dc'
         });
     growlProvider.globalTimeToLive(3000);
     //growlProvider.globalDisableCountDown(true);

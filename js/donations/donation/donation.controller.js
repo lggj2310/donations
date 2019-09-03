@@ -5,8 +5,8 @@
         .module('DonationsApp')
         .controller('DonationController', DonationController);
 
-    DonationController.$inject = ['$scope', '$state', '$cookies', 'growl', 'AuthenticationService', 'DonorService', 'uibDateParser', 'blockUI', 'DonationModel'];
-    function DonationController($scope, $state, $cookies, growl, AuthenticationService, DonorService, uibDateParser, blockUI, DonationModel) {
+    DonationController.$inject = ['$scope', '$state', '$cookies', 'growl', 'AuthenticationService', 'DonorService', 'uibDateParser', 'blockUI'];
+    function DonationController($scope, $state, $cookies, growl, AuthenticationService, DonorService, uibDateParser, blockUI) {
 		var dc = this;
 		
 		dc.$onInit = onInit

@@ -1,0 +1,45 @@
+<!-- Modal content-->
+<div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="ddc.close()">&times;</button>
+        <h4 class="modal-title"> Transaction #{{ ddc.TransactionNumber }} </h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <h5><strong>Date Created</strong></h5>
+                    <span>{{ ddc.DateCreated | date: 'MM/dd/y hh:mm'}}</span>
+                </div>
+                <div class="form-group">
+                    <h5><strong>Status</strong></h5>
+                    <span>{{ ddc.PledgeStatusType }}</span>
+                </div>
+                <div class="form-group">
+                    <h5><strong>Payment Type</strong></h5>
+                    <span>{{ ddc.PaymentType }}</span>
+                </div>
+                <div class="form-group">
+                    <h5><strong>Pledge</strong></h5>
+                    <span> ${{ ddc.PaymentAmount }}</span>
+                </div>
+                <div class="form-group">
+                    <h5><strong>Total Annual Amount</strong></h5>
+                    <span> ${{ ddc.TotalValue }}</span>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-12">
+                <h4> Charity Details </h4>
+                <div class="form-group">
+                    <span> <strong> ${{ ddc.TotalValue }} </strong> {{ ddc.AgencyName }} </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <div class="modal-footer">
+<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+</div> -->

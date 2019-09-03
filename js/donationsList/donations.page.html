@@ -1,0 +1,47 @@
+
+<div>
+    <div block-ui="donationsBlock"></div>
+</div>
+    
+<div class="row">
+    <div class="col-sm-12">
+        <button class="btn btn-primary" ng-click="dsc.makeDonation()"> Make a Donation </button>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-sm-12">
+        <table class="table table-responsive table-striped table-hover">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="text-center">Date</th>
+                    <th class="text-center">Campaign</th>
+                    <th class="text-center">Pledge</th>
+                    <th class="text-center">Payment Type</th>
+                    <th class="text-center">Total</th>    
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="donation in dsc.donations" class="text-center">
+                    <td>
+                        <div class="btn-group" uib-dropdown>
+                            <button id="btn-append-to-single-button" type="button" class="btn btn-default" uib-dropdown-toggle>
+                                <span class="glyphicon glyphicon-chevron-down"></span>
+                            </button>
+                            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="btn-append-to-single-button">
+                                <li role="menuitem"><a ng-click="dsc.GetDonation($event, donation.Id)" data-toggle="modal" data-target="#donationDetails">Details</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                    <!-- <td> <button ng-click="dsc.GetDonation(donation.Id)" data-toggle="modal" data-target="#donationDetails"><span class="glyphicon glyphicon-chevron-down"></span></button></td> -->
+                    <td> {{ donation.DateCreated | date: "MM/dd/y" }} </td>
+                    <td> {{ donation.CampaignName }} </td>
+                    <td> {{ donation.Id }} </td>
+                    <td> {{ donation.PaymentType }} </td>
+                    <td> $ {{ donation.TotalValue }} </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

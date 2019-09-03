@@ -1,0 +1,1 @@
+angular.module('DonationsApp', ['ui.router', 'ngCookies', 'ui.bootstrap', 'ui.mask', 'angular-growl', 'blockUI']);
