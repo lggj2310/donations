@@ -5,11 +5,9 @@
         .module('DonationsApp')
         .factory('DonorService', DonorService);
 
-    DonorService.$inject = ['$http', '$cookies'];
-    function DonorService($http, $cookies) {
+    DonorService.$inject = ['DonorRepository', '$cookies', 'apiUrl', 'apiKey'];
+    function DonorService(DonorRepository, $cookies, apiUrl, apiKey) {
         var service = {};
-        var apiUrl = 'http://192.168.7.51:3000/api';
-        var apiKey = "RTJ4+E4067P+mqIEizOkGu7nHAxRBfZzkE+/+r1/SbQ=";
 
         service.GetPaymentTypeConfiguration = GetPaymentTypeConfiguration;
         service.GetCountriesConfiguration = GetCountriesConfiguration;
@@ -88,24 +86,11 @@
         function GetDonations(donorToken, callback) {
             var apiToken = $cookies.get('apiToken');
             
-            $http({
-                method: 'GET',
-                url: apiUrl + '/Donor/GivingHistory', 
-                params: { 
-                    donorToken: donorToken,
-                    apiKey: apiKey
-                },
-                headers: {
-                    Authorization: 'Bearer ' + apiToken
+            DonorRepository.GetDonations(apiUrl, apiToken, donorToken, apiKey).then(
+                function(response) {
+                    callback(response);
                 }
-            })
-            .then(function (response) {
-                callback(response.data.Data);
-            })
-            .catch(function (err) {
-                console.log(err);
-                return err;
-            });
+            );
 
         }
 
@@ -114,26 +99,11 @@
 
             var apiToken = $cookies.get('apiToken');
 
-            $http({
-                method: 'GET',
-                url: apiUrl + '/Configuration/PaymentTypeConfiguration', 
-                params: { 
-                    donorToken: donorToken,
-                    paymentType: paymentType,
-                    apiKey: apiKey
-                },
-                headers: {
-                    Authorization: 'Bearer ' + apiToken
-                }
-            })
-            .then(function (response) {
-                callback(response.data.Data);
+            DonorRepository.GetPaymentTypeConfiguration(apiUrl, apiToken, donorToken, paymentType, apiKey).then(function (response) {
+                callback(response);
             })
             .catch(function (err) {
                 console.log(err);
-                if (err == "Token has expired.") {
-                    return -1
-                }
                 return err;
             });
 
@@ -143,19 +113,8 @@
 
             var apiToken = $cookies.get('apiToken');
 
-            $http({
-                method: 'GET',
-                url: apiUrl + '/Configuration/Countries', 
-                params: { 
-                    donorToken: donorToken,
-                    apiKey: apiKey
-                },
-                headers: {
-                    Authorization: 'Bearer ' + apiToken
-                }
-            })
-            .then(function (response) {
-                callback(response.data.Data);
+            DonorRepository.GetCountriesConfiguration(apiUrl, apiToken, donorToken, apiKey).then(function (response) {
+                callback(response);
             })
             .catch(function (err) {
                 console.log(err);
@@ -168,19 +127,8 @@
 
             var apiToken = $cookies.get('apiToken');
 
-            $http({
-                method: 'GET',
-                url: apiUrl + '/Configuration/USStates', 
-                params: { 
-                    donorToken: donorToken,
-                    apiKey: apiKey
-                },
-                headers: {
-                    Authorization: 'Bearer ' + apiToken
-                }
-            })
-            .then(function (response) {
-                callback(response.data.Data);
+            DonorRepository.GetStatesConfiguration(apiUrl, apiToken, donorToken, apiKey).then(function (response) {
+                callback(response);
             })
             .catch(function (err) {
                 console.log(err);
@@ -193,19 +141,8 @@
 
             var apiToken = $cookies.get('apiToken');
 
-            $http({
-                method: 'GET',
-                url: apiUrl + '/Configuration/IntroductoryPanel', 
-                params: { 
-                    donorToken: donorToken,
-                    apiKey: apiKey
-                },
-                headers: {
-                    Authorization: 'Bearer ' + apiToken
-                }
-            })
-            .then(function (response) {
-                callback(response.data.Data);
+            DonorRepository.GetAgencyConfiguration(apiUrl, apiToken, donorToken, apiKey).then(function (response) {
+                callback(response);
             })
             .catch(function (err) {
                 console.log(err);
@@ -260,25 +197,7 @@
                 IsConfirmed: true
             }];
 
-            // $http.get("https://ipinfo.io/json").then(function (response) 
-            // {
-            //     ipAddress = response.data.ip;
-            // });
-
-            $http({
-                method: 'POST',
-                url: apiUrl + '/Donation/Save', 
-                params: { 
-                    apiKey: apiKey,
-                    donorToken: donorToken,
-                    ipAddress: ipAddress
-                },
-                data: service.pledge,
-                headers: {
-                    Authorization: 'Bearer ' + apiToken,
-                    Accept: 'application/json'
-                }
-            })
+            DonorRepository.SendDonation(apiUrl, apiToken, donorToken, ipAddress, service.pledge, apiKey)
             .then(function (response) {
                 callback(response);
             })
@@ -286,18 +205,6 @@
                 console.log(err);
                 return err;
             });
-        }
-
-        // private functions
-
-        function handleSuccess(res) {
-            return res.data;
-        }
-
-        function handleError(error) {
-            return function () {
-                return { success: false, message: error };
-            };
         }
     }
 

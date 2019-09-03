@@ -5,9 +5,11 @@
         .module('DonationsApp')
         .controller('MainController', MainController);
 
-    MainController.$inject = ['$location', '$cookies', '$interval', 'AuthenticationService'];
-    function MainController($location, $cookies, $interval, AuthenticationService) {
+    MainController.$inject = ['$state', '$cookies', '$interval', 'AuthenticationService'];
+    function MainController($state, $cookies, $interval, AuthenticationService) {
         var mc = this;
+
+        
 
         AuthenticationService.GetAppAuthToken();
         mc.authKey = $cookies.get('apiToken');
@@ -17,9 +19,8 @@
         }, 60000);
 
         if (mc.donorKey == '' || mc.donorKey == undefined) {
-            $location.path('/');
+            $state.go('login');
         }
-
 
 
         

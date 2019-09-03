@@ -54,7 +54,16 @@
                             <div class="form-group" ng-class="{'has-error': dc.cardInformationForm.cardType.$error.required && dc.cardInformationForm.cardType.$touched}">
                                 <label class="control-label col-sm-2" for="cardType">Card Type:</label>
                                 <div class="col-sm-10">
-                                    <select name="cardType" class="form-control" ng-change="dc.cardTypeValidation()" ng-model="dc.donation.CustomField1" id="cardType" required>
+                                    <select name="cardType" 
+                                            class="form-control" 
+                                            ng-change="dc.cardTypeValidation()" 
+                                            ng-model="dc.donation.CustomField1" 
+                                            id="cardType" 
+                                            uib-tooltip="Select the type of the credit card."
+                                            tooltip-placement="top"
+                                            tooltip-trigger="'mouseenter'"
+                                            tooltip-enable="!dc.donation.CustomField1"
+                                            required>
                                         <option ng-repeat="cardType in dc.paymentInfo.CreditCardTypeList" ng-value="{{cardType}}"> {{ dc.creditCardTypes[$index] }} </option>
                                     </select>
                                 </div>
@@ -62,7 +71,21 @@
                             <div class="form-group" ng-class="{'has-error': dc.cardInformationForm.cardNumber.$invalid && dc.cardInformationForm.cardNumber.$touched}">
                                 <label class="control-label col-sm-2" for="cardNumber">Card Number:</label>
                                 <div class="col-sm-10"> 
-                                    <input type="text" ng-disabled="dc.donation.CustomField1 == ''" ng-model="dc.donation.CustomField3" ui-options="'allowInvalidValue:false'" ng-pattern="dc.getCardPattern()" ng-change="dc.cardNumberValidation()" name="cardNumber" class="form-control" id="cardNumber" placeholder="Enter card number" required>
+                                    <input type="text" 
+                                            ng-disabled="dc.donation.CustomField1 == ''" 
+                                            ng-model="dc.donation.CustomField3"
+                                            ui-options="'allowInvalidValue:false'" 
+                                            ng-pattern="dc.getCardPattern()"
+                                            ng-change="dc.cardNumberValidation()"
+                                            name="cardNumber" 
+                                            class="form-control" 
+                                            id="cardNumber" 
+                                            placeholder="Enter card number" 
+                                            uib-tooltip="Enter the verification code that is in front of the card."
+                                            tooltip-placement="top"
+                                            tooltip-trigger="'mouseenter'"
+                                            tooltip-enable="!dc.donation.CustomField3"
+                                            required>
                                     <span class="text-danger" ng-show="dc.cardInformationForm.cardNumber.$error.required && dc.cardInformationForm.cardNumber.$touched">
                                         Required!
                                     </span>
@@ -71,25 +94,73 @@
                             <div class="form-group" ng-class="{'has-error': !dc.cardInformationForm.cardVerificationNumber.$valid && dc.cardInformationForm.cardVerificationNumber.$touched}"> 
                                 <label class="control-label col-sm-2" for="cardVerificationNumber">Card Verification Number:</label>
                                 <div class="col-sm-10"> 
-                                    <input type="text" ng-pattern="/^[0-9]+$/" ng-maxlength="{{dc.verficiationNumberLength}}" name="cardVerificationNumber" class="form-control" ng-model="dc.donation.CustomField6"  id="cardVerificationNumber" placeholder="Enter card verification number" required>
+                                    <input type="text" 
+                                            ng-pattern="/^[0-9]+$/" 
+                                            ng-maxlength="{{dc.verficiationNumberLength}}" 
+                                            name="cardVerificationNumber" 
+                                            class="form-control" 
+                                            ng-model="dc.donation.CustomField6"  
+                                            id="cardVerificationNumber" 
+                                            placeholder="Enter card verification number" 
+                                            uib-tooltip="Enter the verification code that is in the back of the card."
+                                            tooltip-placement="top"
+                                            tooltip-trigger="'mouseenter'"
+                                            tooltip-enable="!dc.donation.CustomField6"
+                                            required>
                                 </div>
                             </div>
                             <div class="form-group" ng-class="{'has-error': dc.cardInformationForm.nameOnCard.$error.required && dc.cardInformationForm.nameOnCard.$touched}"> 
                                 <label class="control-label col-sm-2" for="nameOnCard">Name On Card:</label>
                                 <div class="col-sm-10"> 
-                                    <input type="text" name="nameOnCard" class="form-control" ng-model="dc.donation.CustomField2"  id="nameOnCard" placeholder="Enter the name on card" required>
+                                    <input type="text" 
+                                            name="nameOnCard" 
+                                            class="form-control" 
+                                            ng-model="dc.donation.CustomField2"  
+                                            id="nameOnCard" 
+                                            placeholder="Enter the name on card" 
+                                            uib-tooltip="Enter the name that is in front of the card."
+                                            tooltip-placement="top"
+                                            tooltip-trigger="'mouseenter'"
+                                            tooltip-enable="!dc.donation.CustomField2"
+                                            required>
                                 </div>
                             </div>
                             <div class="form-group" ng-class="{'has-error': dc.cardInformationForm.expirationDate.$error.required && dc.cardInformationForm.expirationDate.$touched}"> 
                                 <label class="control-label col-sm-2" for="expirationDate">Expiration Date:</label>
+                                <!-- <p class="input-group">
+                                    <input type="text" class="form-control" uib-datepicker-popup ng-model="dc.donation.CustomField4" format="MM/yyyy" datepicker-options='options' is-open="datePopup.opened" required/>
+                                    <input type="text" class="form-control" datepicker-popup="MM/yyyy" uib-datepicker-popup ng-model="dc.donation.CustomField4" is-open="opened" datepicker-options="{minMode: 'month'}" datepicker-mode="'month'" show-button-bar="false" show-weeks="false" close-on-date-selection="true" ng-required="true" />
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" ng-click="openPopup()"><i class="glyphicon glyphicon-calendar"></i></button>
+                                    </span>
+                                </p> -->
                                 <div class="col-sm-10"> 
-                                    <input type="text" ui-mask="99/9999" name="expirationDate" class="form-control" ng-model="dc.donation.CustomField4" id="expirationDate" placeholder="" required>
+                                    <input type="text" 
+                                            ui-mask="99/9999"
+                                            name="expirationDate" 
+                                            class="form-control" 
+                                            ng-model="dc.donation.CustomField4" 
+                                            id="expirationDate" 
+                                            uib-tooltip="Enter the month and year of expiration date in front of the card."
+                                            tooltip-placement="top"
+                                            tooltip-trigger="'mouseenter'"
+                                            tooltip-enable="!dc.donation.CustomField4"
+                                            required>
                                 </div>
                             </div>
                             <div class="form-group"> 
                                 <label class="col-sm-2" for="contactEmail">Contact Email Address:</label>
                                 <div class="col-sm-10"> 
-                                    <input type="email" name="contactEmail" class="form-control" ng-model="dc.donation.CustomField5" id="contactEmail" placeholder="Enter the contact email address">
+                                    <input type="email" 
+                                            name="contactEmail" 
+                                            class="form-control" 
+                                            ng-model="dc.donation.CustomField5" 
+                                            id="contactEmail" 
+                                            placeholder="Enter the contact email address"
+                                            uib-tooltip="Enter the contact email."
+                                            tooltip-placement="top"
+                                            tooltip-trigger="'mouseenter'"
+                                            tooltip-enable="!dc.donation.CustomField5">
                                 </div>
                             </div>
                         </form>
@@ -126,7 +197,7 @@
                                     <input type="text" name="city" class="form-control" ng-model="dc.donation.Payment.BillingCity" id="city" placeholder="City" required>
                                 </div>
                             </div>
-                            <div class="form-group" ng-show="dc.donation.Payment.BillingCountryCode == 'us'" ng-class="{'has-error': billingForm.state.$error.required && billingForm.state.$touched}">
+                            <div class="form-group" ng-if="dc.donation.Payment.BillingCountryCode == 'us'" ng-class="{'has-error': billingForm.state.$error.required && billingForm.state.$touched}">
                                 <label class="control-label col-sm-2" for="state">State</label>
                                 <div class="col-sm-10">
                                     <select class="form-control" name="state" ng-model="dc.donation.Payment.BillingState" id="state" ng-required="country == 'us'">
@@ -134,25 +205,25 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group" ng-show="dc.donation.Payment.BillingCountryCode != 'us'" ng-class="{'has-error': billingForm.province.$error.required && billingForm.province.$touched}"> 
+                            <div class="form-group" ng-if="dc.donation.Payment.BillingCountryCode != 'us'" ng-class="{'has-error': billingForm.province.$error.required && billingForm.province.$touched}"> 
                                 <label class="control-label col-sm-2" for="province">Province</label>
                                 <div class="col-sm-10"> 
-                                    <input type="text" name="province" class="form-control" ng-model="dc.donation.Payment.BillingState" id="province" placeholder="Province" ng-required="country != 'us'">
+                                    <input type="text" name="province" class="form-control" ng-model="dc.donation.Payment.BillingState" id="province" placeholder="Province" ng-required="required">
                                 </div>
                             </div>
-                            <div class="form-group" ng-show="dc.donation.Payment.BillingCountryCode == 'us'" ng-class="{'has-error': billingForm.zipCode.$error.required && billingForm.zipCode.$touched}"> 
+                            <div class="form-group" ng-if="dc.donation.Payment.BillingCountryCode == 'us'" ng-class="{'has-error': billingForm.zipCode.$error.required && billingForm.zipCode.$touched}"> 
                                 <label class="control-label col-sm-2" for="zipCode">Zip Code</label>
                                 <div class="col-sm-5"> 
-                                    <input type="text" name="zipCode" class="form-control" ng-model="dc.donation.Payment.BillingZipCode" id="zipCode" placeholder="Zip Code" ng-required="country == 'us'">
+                                    <input type="text" name="zipCode" class="form-control" ng-model="dc.donation.Payment.BillingZipCode" id="zipCode" placeholder="Zip Code" ng-required="required">
                                 </div>
                                 <div class="col-sm-5"> 
                                     <input type="text" class="form-control" ng-model="dc.donation.Payment.BillingZipCodeExt" id="zipCodeExt" placeholder="Zip Code Extension">
                                 </div>
                             </div>
-                            <div class="form-group" ng-show="dc.donation.Payment.BillingCountryCode != 'us'" ng-class="{'has-error': billingForm.postalCode.$error.required && billingForm.postalCode.$touched}"> 
+                            <div class="form-group" ng-if="dc.donation.Payment.BillingCountryCode != 'us'" ng-class="{'has-error': billingForm.postalCode.$error.required && billingForm.postalCode.$touched}"> 
                                 <label class="control-label col-sm-2" for="postalCode">Postal Code</label>
                                 <div class="col-sm-10"> 
-                                    <input type="text" name="postalCode" class="form-control" ng-model="dc.donation.Payment.BillingZipCode" id="postalCode" placeholder="Postal Code" ng-required="country != 'us'">
+                                    <input type="text" name="postalCode" class="form-control" ng-model="dc.donation.Payment.BillingZipCode" id="postalCode" placeholder="Postal Code" ng-required="required">
                                 </div>
                             </div>
                         </form>

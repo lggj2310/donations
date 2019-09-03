@@ -1,1 +1,1 @@
-angular.module('DonationsApp', ['ui.route', 'ngCookies', 'ngTouch', 'ngAnimate', 'ui.bootstrap', 'ui.mask']);
+angular.module('DonationsApp', ['ui.router', 'ngCookies', 'ui.bootstrap', 'ui.mask', 'angular-growl', 'blockUI']);

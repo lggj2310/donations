@@ -5,52 +5,180 @@
         .module('DonationsApp')
         .controller('DonationController', DonationController);
 
-    DonationController.$inject = ['$location', '$cookies', 'AuthenticationService', 'DonorService'];
-    function DonationController($location, $cookies, AuthenticationService, DonorService) {
-        var dc = this;
-        var paymentType = 2;
-
-        dc.donation = DonorService.donation;
-
-        dc.donation.status = 'pending';
-
-        dc.authKey = $cookies.get('apiToken');
-        dc.donorKey = $cookies.get('donorToken');
-        if (dc.authKey == '' || dc.authKey == undefined) {
-            dc.authKey = AuthenticationService.GetAppAuthToken();
-        }
-
-        if (dc.donorKey == '' || dc.donorKey == undefined) {
-        	$location.path('/');
-        }
-
-        //Today Date
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
-
-        today = mm + '/' + dd + '/' + yyyy;
-
-		dc.currentDate = today;
-		dc.currentYear = yyyy;
-
-
-		//// Payment Section ////
+    DonationController.$inject = ['$scope', '$state', '$cookies', 'growl', 'AuthenticationService', 'DonorService', 'uibDateParser', 'blockUI'];
+    function DonationController($scope, $state, $cookies, growl, AuthenticationService, DonorService, uibDateParser, blockUI) {
+		var dc = this;
 		
-		// Default Data //
-		dc.frecuencyOptionLabels = ['One-time', 'Monthly', 'Quaternaly', 'Semi-annual'];
-		dc.customAmountField = false;
+		dc.$onInit = onInit
+        
+		function onInit() {
 
-		// API Data //
-        DonorService.GetPaymentTypeConfiguration(dc.donorKey, paymentType, function (response) {
-          if (response) {
-              dc.paymentInfo = response;
-          } 
-		});
+			dc.paymentType = 2;
 
-		// Functions //
-		dc.customValue = customValue;
+			dc.donationBlockUI = blockUI.instances.get('donationBlock');
+			dc.donation = DonorService.donation;
+			
+			dc.donation.status = 'pending';
+
+			dc.authKey = $cookies.get('apiToken');
+			dc.donorKey = $cookies.get('donorToken');
+			if (dc.authKey == '' || dc.authKey == undefined) {
+				dc.authKey = AuthenticationService.GetAppAuthToken();
+			}
+
+			if (dc.donorKey == '' || dc.donorKey == undefined) {
+				$state.path('login');
+			}
+
+			//Today Date
+			var today = new Date();
+			var dd = String(today.getDate()).padStart(2, '0');
+			var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+			var yyyy = today.getFullYear();
+
+			today = mm + '/' + dd + '/' + yyyy;
+
+			dc.currentDate = today;
+			dc.currentYear = yyyy;
+
+
+			//// Payment Section ////
+			
+			// Default Data //
+			dc.frecuencyOptionLabels = ['One-time', 'Monthly', 'Quaternaly', 'Semi-annual'];
+			dc.customAmountField = false;
+
+
+			blockUI.start("Testing the text");
+			// API Data //
+			DonorService.GetPaymentTypeConfiguration(dc.donorKey, dc.paymentType, function (response) {
+			if (response) {
+				dc.paymentInfo = response;
+			} 
+			});
+
+			// Functions //
+			dc.customValue = customValue;
+
+			//// Credit Card Section ////
+
+			//Credit Card Default Data
+			dc.creditCardTypes = ['Visa', 'Master Card', 'American Express', 'Discover', 'Diners Club'];
+			dc.cardMask = '9999 9999 9999 9999';
+			dc.cardPattern = '';
+			dc.verficiationNumberLength = 3;
+
+			// Functions //
+			dc.cardTypeValidation = cardTypeValidation;
+			dc.getCardPattern = getCardPattern;
+
+			//// Billing Information Section ////
+
+			$scope.today = function() {
+				$scope.dt = new Date();
+			};
+			$scope.today();
+
+			
+			$scope.formats = ['MM/yyyy'];
+			$scope.format = $scope.formats[0];
+			$scope.altInputFormats = ['M!/yyyy'];
+			$scope.options = {
+				showWeeks: false,
+				formatYear: 'yy',
+				startingDay: 1,
+				datepickerMode: 'month',
+				minMode: 'month',
+			};
+
+			$scope.openPopup = function() {
+				$scope.datePopup.opened = true;
+			};
+
+			$scope.datePopup = {
+				opened: false
+			};
+
+			$scope.dateOptions = {
+				'year-format': "'yy'",
+				'starting-day': 1,
+				'datepicker-mode':"'month'",
+				'min-mode':"month"
+			};
+
+			// API Data //
+			DonorService.GetCountriesConfiguration(dc.donorKey, function (response) {
+				if (response) {
+					dc.countriesInfo = response;
+				} 
+			});
+
+			DonorService.GetStatesConfiguration(dc.donorKey, function (response) {
+				if (response) {
+					dc.statesInfo = response;
+				} 
+			});
+
+			//// Agency Section ////
+
+			// Default Data //
+			dc.selectedAgency = {};
+			dc.agencyChange = agencyChange;
+		
+			// API Data //
+			DonorService.GetAgencyConfiguration(dc.donorKey, function (response) {
+				if (response) {
+					dc.agencyInfo = response;
+					blockUI.stop();
+				} 
+			});
+
+			//// Review Section ////
+			dc.sendDonation = sendDonation;
+			dc.donation.TotalValue = dc.donation.PaymentTotalValue;
+
+			dc.isSuccess = true;
+			dc.donationResponse = {};
+
+			//// Wizard Section ////
+		
+			// Default Data //
+			dc.oneAtATime = true;
+			dc.currentStep = 1;
+			dc.steps = [
+			{
+				step: 1,
+				name: "Select Payment",
+				template: "js/donation/payment.html",
+				forms: ['dc.paymentForm', 'dc.cardInformationForm', 'dc.billingForm']
+			},
+			{
+				step: 2,
+				name: "Select Charity",
+				template: "js/donation/agency.html",
+				forms: ['dc.agencyForm']
+			},   
+			{
+				step: 3,
+				name: "Confirm",
+				template: "js/donation/details.html",
+				forms: []
+			},
+			{
+				step: 4,
+				name: "Thank you",
+				template: "js/donation/verification.html",
+				forms: []
+			}             
+			];
+			
+			// Functions //
+			dc.goToStep = goToStep;
+			dc.pendingForm = false;
+			dc.getStepTemplate = getStepTemplate;
+		}
+
+        
 
 		function customValue(isCustom) {
 			dc.customAmount = isCustom;
@@ -58,15 +186,7 @@
 		
 		//// Credit Card Section ////
 
-		//Credit Card Default Data
-		dc.creditCardTypes = ['Visa', 'Master Card', 'American Express', 'Discover', 'Diners Club'];
-		dc.cardMask = '9999 9999 9999 9999';
-		dc.cardPattern = '';
-		dc.verficiationNumberLength = 3;
-
 		// Functions //
-		dc.cardTypeValidation = cardTypeValidation;
-		dc.getCardPattern = getCardPattern;
 
 		function cardTypeValidation() {
 			dc.cardMask = getCardMask();
@@ -107,37 +227,7 @@
 			return pattern[cardPatt];
 		}
 
-
-		//// Billing Information Section ////
-
-		// API Data //
-        DonorService.GetCountriesConfiguration(dc.donorKey, function (response) {
-          if (response) {
-              dc.countriesInfo = response;
-          } 
-        });
-
-        DonorService.GetStatesConfiguration(dc.donorKey, function (response) {
-          if (response) {
-              dc.statesInfo = response;
-          } 
-		});
-		
-		
-
-
 		//// Agency Section ////
-
-		// Default Data //
-		dc.selectedAgency = {};
-		dc.agencyChange = agencyChange;
-	
-		// API Data //
-        DonorService.GetAgencyConfiguration(dc.donorKey, function (response) {
-          if (response) {
-              dc.agencyInfo = response;
-          } 
-		});
 		
 		// Functions //
 		function agencyChange(agency) {
@@ -156,11 +246,7 @@
 
 
 		//// Review Section ////
-		dc.sendDonation = sendDonation;
-		dc.donation.TotalValue = dc.donation.PaymentTotalValue;
 
-		dc.isSuccess = true;
-		dc.donationResponse = {};
 		// Functions //
 		function sendDonation() {
 			DonorService.SendDonation(dc.donorKey, function name(response) {
@@ -177,40 +263,8 @@
 		//// Verification Section ////
 
 		//// Wizard Section ////
-		
-		// Default Data //
-		dc.oneAtATime = true;
-        dc.currentStep = 1;
-        dc.steps = [
-          {
-            step: 1,
-            name: "Select Payment",
-            template: "js/donation/payment.html",
-            forms: ['dc.paymentForm', 'dc.cardInformationForm', 'dc.billingForm']
-          },
-          {
-            step: 2,
-            name: "Select Charity",
-            template: "js/donation/agency.html",
-            forms: ['dc.agencyForm']
-          },   
-          {
-            step: 3,
-            name: "Confirm",
-            template: "js/donation/details.html",
-            forms: []
-          },
-          {
-            step: 4,
-            name: "Thank you",
-            template: "js/donation/verification.html",
-            forms: []
-          }             
-        ];
         
         // Functions //
-		dc.goToStep = goToStep;
-		dc.pendingForm = false;
         
         function goToStep(newStep) {
           	if (newStep == 3) {
@@ -237,11 +291,13 @@
 				if (!dc.paymentForm.$valid || !dc.cardInformationForm.$valid || !dc.billingForm.$valid) {
 					isValid = false;
 					dc.pendingForm = true;
+					growl.error("You must suply valid information for your payment", {});
 			  	}
 			} else if (dc.currentStep == 2) {
 				if (!dc.agencyForm.$valid) {
 					isValid = false;
 					dc.pendingForm = true;
+					growl.error("You must suply valid information for your charity", {});
 				}	
 			}
           
@@ -254,7 +310,7 @@
           
         }
         
-        dc.getStepTemplate = function(){
+		function getStepTemplate(){
           for (var i = 0; i < dc.steps.length; i++) {
                 if (dc.currentStep == dc.steps[i].step) {
                     return dc.steps[i].template;
@@ -262,11 +318,6 @@
             }
         }
 
-        
-
-        function cardNumberValidation() {
-
-        }
     }
 
 })();

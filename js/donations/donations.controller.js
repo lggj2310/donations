@@ -5,33 +5,50 @@
         .module('DonationsApp')
         .controller('DonationsController', DonationsController);
 
-    DonationsController.$inject = ['$location', '$cookies', 'DonorService', '$uibModal'];
-    function DonationsController($location, $cookies, DonorService, $uibModal) {
+    DonationsController.$inject = ['$scope', '$state', '$cookies', 'DonorService', 'blockUI'];
+    function DonationsController($scope, $state, $cookies, DonorService, blockUI) {
         var dsc = this;
 
-        var donorToken = $cookies.get('donorToken');
+        dsc.$onInit = onInit;
 
-        dsc.makeDonation = makeDonation;
-        // dsc.DonationDetails = DonationDetails;
-        dsc.GetDonations = GetDonations();
-        dsc.GetDonation = GetDonation;
+        function onInit() {
+            dsc.donorToken = $cookies.get('donorToken');
 
-        if (donorToken == '' || donorToken == undefined) {
-            $location.path('/');
+            if (dsc.donorToken == '' || dsc.donorToken == undefined) {
+                $state.go('login');
+            }
+
+            dsc.donationsBlockUI = blockUI.instances.get('donationsBlock');
+
+            dsc.makeDonation = makeDonation;
+            // dsc.DonationDetails = DonationDetails;
+            dsc.GetDonations = GetDonations;
+            dsc.GetDonation = GetDonation;
+            
+            $scope.status = {
+                isopen: false
+            };
+    
+            $scope.toggleDropdown = function($event) {
+                $event.preventDefault();
+                $event.stopPropagation();
+                $scope.status.isopen = !$scope.status.isopen;
+            };
+    
+            dsc.title = "Donations";
+
+            GetDonations();
         }
 
-        dsc.title = "Donations";
-        // (function initController() {
-        //     // reset login status
-        //     // AuthenticationService.ClearCredentials();
-        // })();
-
         function makeDonation() {
-            $location.path('/donation');
+            $state.go('donation');
         }
 
         function GetDonations() {
-            DonorService.GetDonations(donorToken, function(response) {
+
+            blockUI.start();
+
+            DonorService.GetDonations(dsc.donorToken, function(response) {
                 dsc.donations = response.PledgeList;
 
                 dsc.donations.forEach(element => {
@@ -43,11 +60,38 @@
                         element.PledgeStatusType = 'Submitted'
                     }
                 });
+
+                blockUI.stop();
             });
         }
 
-        function GetDonation(id) {
+        function GetDonation(e, id) {
+            e.preventDefault();
             dsc.donation = dsc.donations.filter(donation => donation.Id === id);
+
+            $state.go('donations.details', {
+                donationId: id,
+                TransactionNumber: dsc.donation[0].TransactionNumber,
+                DateCreated: dsc.donation[0].DateCreated,
+                PledgeStatusType: dsc.donation[0].PledgeStatusType,
+                PaymentType: dsc.donation[0].PaymentType,
+                PaymentAmount: dsc.donation[0].PaymentAmount,
+                TotalValue: dsc.donation[0].TotalValue,
+                AgencyName: dsc.donation[0].DesignationList[0].Name
+                
+            });
+            /*
+            , {
+                donationId: id,
+                DateCreated: dsc.donation[0].DateCreated,
+                PledgeStatusType: dsc.donation[0].PledgeStatusType,
+                PaymentType: dsc.donation[0].PaymentType,
+                PaymentAmount: dsc.donation[0].PaymentAmount,
+                TotalValue: dsc.donation[0].TotalValue,
+                AgencyName: dsc.donation[0].DesignationList[0].Name
+                
+            }
+            */
         }
     }
 
